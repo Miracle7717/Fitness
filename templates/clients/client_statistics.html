@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика клиентов{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-chart-pie"></i> Статистика клиентов</h1>
+            <a href="{% url 'client_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Назад к списку
+            </a>
+        </div>
+        
+        <!-- Основная статистика -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-users"></i> Всего клиентов</h5>
+                        <p class="card-text display-6">{{ total_clients }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-check-circle"></i> Активных</h5>
+                        <p class="card-text display-6">{{ active_clients }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-pause-circle"></i> Приостановленных</h5>
+                        <p class="card-text display-6">{{ suspended_clients }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-white bg-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-times-circle"></i> Неактивных</h5>
+                        <p class="card-text display-6">{{ inactive_clients }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Дополнительная статистика -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Активность клиентов</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><i class="fas fa-id-card text-success"></i> 
+                           Клиентов с активными абонементами: <strong>{{ clients_with_active_memberships }}</strong></p>
+                        <p><i class="fas fa-user-plus text-primary"></i> 
+                           Новых клиентов за 30 дней: <strong>{{ new_clients }}</strong></p>
+                        <hr>
+                        <p class="text-muted">
+                            <small>Доля клиентов с активными абонементами: 
+                            {% if total_clients > 0 %}
+                                {{ clients_with_active_memberships|floatformat:0 }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Распределение по статусам</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress mb-3" style="height: 30px;">
+                            {% if total_clients > 0 %}
+                            <div class="progress-bar bg-success" 
+                                 style="width: {% widthratio active_clients total_clients 100 %}%">
+                                Активные ({{ active_clients }})
+                            </div>
+                            <div class="progress-bar bg-warning" 
+                                 style="width: {% widthratio suspended_clients total_clients 100 %}%">
+                                Приостановленные ({{ suspended_clients }})
+                            </div>
+                            <div class="progress-bar bg-secondary" 
+                                 style="width: {% widthratio inactive_clients total_clients 100 %}%">
+                                Неактивные ({{ inactive_clients }})
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Активные клиенты
+                                <span class="badge bg-success rounded-pill">{{ active_clients }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Приостановленные
+                                <span class="badge bg-warning rounded-pill">{{ suspended_clients }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Неактивные
+                                <span class="badge bg-secondary rounded-pill">{{ inactive_clients }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Экспорт -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Экспорт данных</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="#" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-file-excel"></i> Экспорт в Excel
+                        </a>
+                        <p class="text-muted small">Экспортировать список клиентов в формате Excel</p>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#" class="btn btn-danger w-100 mb-2">
+                            <i class="fas fa-file-pdf"></i> Экспорт в PDF
+                        </a>
+                        <p class="text-muted small">Создать отчет в формате PDF</p>
+                    </div>
+                </div>
+           {% endblock %}

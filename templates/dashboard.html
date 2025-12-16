@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Дашборд{% endblock %}
+
+{% block content %}
+<p class="lead">Добро пожаловать, {{ user.get_full_name|default:user.username }}! 
+    {% if user.is_superuser %}
+        <span class="badge bg-danger">Администратор</span>
+    {% elif user.is_staff %}
+        <span class="badge bg-primary">Сотрудник</span>
+    {% else %}
+        <span class="badge bg-secondary">Пользователь</span>
+    {% endif %}
+</p>
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-users"></i> Всего клиентов</h5>
+                <p class="card-text display-6">{{ total_clients }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-check-circle"></i> Активные абонементы</h5>
+                <p class="card-text display-6">{{ active_memberships }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-clock"></i> Истекают скоро</h5>
+                <p class="card-text display-6">{{ expiring_soon }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-times-circle"></i> Просроченные</h5>
+                <p class="card-text display-6">{{ expired }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% if user.is_staff or user.is_superuser %}
+    <div class="col-md-3">
+        <a href="#" class="btn btn-primary w-100 mb-2">
+            <i class="fas fa-users"></i> Клиенты
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="#" class="btn btn-info w-100 mb-2">
+            <i class="fas fa-list-alt"></i> Тарифы
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="#" class="btn btn-success w-100 mb-2">
+            <i class="fas fa-credit-card"></i> Платежи
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="#" class="btn btn-warning w-100 mb-2">
+            <i class="fas fa-chart-bar"></i> Отчеты
+        </a>
+    </div>
+    {% endif %}
+</div>
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Системная информация</h5>
+            </div>
+            <div class="card-body">
+                <p>Вы вошли как: <strong>{{ user.get_full_name }}</strong></p>
+                <p>Роль: <span class="badge bg-primary">{{ user.get_role_display_name }}</span></p>
+                <p>Email: {{ user.email|default:"Не указан" }}</p>
+                <p>Телефон: {{ user.phone|default:"Не указан" }}</p>
+                <p>Дата регистрации: {{ user.date_joined|date:"d.m.Y H:i" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Последние действия</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Здесь будет отображаться история действий</p>
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <small>Вы вошли в систему</small>
+                        <br>
+                        <small class="text-muted">Только что</small>
+                    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

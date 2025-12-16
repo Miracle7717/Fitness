@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход в систему{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Вход в систему</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Неверное имя пользователя или пароль.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Имя пользователя</label>
+                        <input type="text" name="username" class="form-control" id="id_username" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Пароль</label>
+                        <input type="password" name="password" class="form-control" id="id_password" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="mb-0 text-muted">
+                        <i class="fas fa-info-circle"></i> Тестовые учетные данные:
+                    </p>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Администратор:</strong></p>
+                            <p class="mb-1">Логин: <code>admin</code></p>
+                            <p class="mb-0">Пароль: <code>admin123</code></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Менеджер:</strong></p>
+                            <p class="mb-1">Логин: <code>manager</code></p>
+                            <p class="mb-0">Пароль: <code>manager123</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

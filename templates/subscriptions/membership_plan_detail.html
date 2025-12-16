@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>{{ plan.name }}</h1>
+        <p>Цена: {{ plan.price }} руб.</p>
+        <p>Период: {{ plan.get_period_display_text }}</p>
+        <p>Посещения: {% if plan.is_unlimited %}Безлимит{% else %}{{ plan.visit_limit }}{% endif %}</p>
+        
+        <div class="btn-group">
+            <a href="{% url 'membership_plan_update' plan.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Редактировать
+            </a>
+            <a href="{% url 'membership_plan_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Назад
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

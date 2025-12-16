@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Абонемент {{ membership.client.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Заголовок и кнопки -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">
+                    <i class="fas fa-id-card"></i> Абонемент
+                </h1>
+                <p class="text-muted mb-0">ID: {{ membership.id }}</p>
+            </div>
+            <div class="btn-group">
+                <a href="{% url 'membership_update' membership.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Редактировать
+                </a>
+                <a href="{% url 'membership_delete' membership.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Удалить
+                </a>
+                <a href="{% url 'membership_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад
+                </a>
+            </div>
+        </div>
+        
+        <!-- Основная информация -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Основная информация</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Клиент:</strong> 
+                                    <a href="{% url 'client_detail' membership.client.pk %}">
+                                        {{ membership.client.get_full_name }}
+                                    </a>
+                                </p>
+                                <p><strong>Телефон:</strong> {{ membership.client.phone }}</p>
+                                <p><strong>Тариф:</strong> 
+                                    <a href="{% url 'membership_plan_detail' membership.plan.pk %}">
+                                        {{ membership.plan.name }}
+                                    </a>
+                                </p>
+                                <p><strong>Цена тарифа:</strong> {{ membership.plan.price }} руб.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Дата начала:</strong> {{ membership.start_date|date:"d.m.Y" }}</p>
+                                <p><strong>Дата окончания:</strong> {{ membership.end_date|date:"d.m.Y" }}</p>
+                                <p><strong>Статус:</strong> 
+                                    {% if membership.status == 'active' %}
+                                        {% if membership.days_remaining %}
+                                            {% if membership.days_remaining <= 7 %}
+                                            <span class="badge bg-warning">Активен ({{ membership.days_remaining }} дн.)</span>
+                                            {% else %}
+                                            <span class="badge bg-success">Активен ({{ membership.days_remaining }} дн.)</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-danger">Просрочен</span>
+                                        {% endif %}
+                                    {% elif membership.status == 'expired' %}
+                                    <span class="badge bg-secondary">Истек</span>
+                                    {% elif membership.status == 'frozen' %}
+                                    <span class="badge bg-info">Заморожен</span>
+                                    {% elif membership.status == 'cancelled' %}
+                                    <span class="badge bg-dark">Отменен</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Автопродление:</strong> 
+                                    {% if membership.auto_renewal %}
+                                    <span class="badge bg-success">Включено</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Выключено</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if membership.frozen_until %}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-snowflake"></i>
+                            <strong>Абонемент заморожен до:</strong> {{ membership.frozen_until|date:"d.m.Y" }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if membership.notes %}
+                        <div class="mt-3">
+                            <h6>Примечания:</h6>
+                            <p class="mb-0">{{ membership.notes|linebreaks }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Информация о тарифе -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Информация о тарифе</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Название тарифа:</strong> {{ membership.plan.name }}</p>
+                                <p><strong>Описание:</strong> {{ membership.plan.description|default:"Нет описания" }}</p>
+                                <p><strong>Период действия:</strong> {{ membership.plan.get_period_display_text }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Лимит посещений:</strong> 
+                                    {% if membership.plan.is_unlimited %}
+                                    <span class="badge bg-info">Безлимит</span>
+                                    {% else %}
+                                    {{ membership.plan.visit_limit }} посещений
+                                    {% endif %}
+                                </p>
+                                <p><strong>Оставшиеся посещения:</strong> 
+                                    {% if membership.remaining_visits is not None %}
+                                    {{ membership.remaining_visits }}
+                                    {% else %}
+                                    <span class="badge bg-info">Безлимит</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Время доступа:</strong> {{ membership.plan.get_access_time_display_text }}</p>
+                                <p><strong>Заморозка:</strong> 
+                                    {% if membership.plan.can_freeze %}
+                                    <span class="badge bg-success">Разрешена</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Запрещена</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Боковая панель -->
+            <div class="col-md-4">
+                <!-- Статистика -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Статистика</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><i class="fas fa-calendar-alt text-primary"></i> 
+                           <strong>Начало:</strong> {{ membership.start_date|date:"d.m.Y" }}</p>
+                        <p><i class="fas fa-calendar-times text-danger"></i> 
+                           <strong>Окончание:</strong> {{ membership.end_date|date:"d.m.Y" }}</p>
+                        <p><i class="fas fa-clock text-warning"></i> 
+                           <strong>Осталось дней:</strong> 
+                           {% if membership.days_remaining %}
+                           {{ membership.days_remaining }}
+                           {% else %}
+                           0
+                           {% endif %}
+                        </p>
+                        <hr>
+                        <p><i class="fas fa-calendar-plus text-success"></i> 
+                           <strong>Создан:</strong> {{ membership.created_at|date:"d.m.Y H:i" }}</p>
+                        <p><i class="fas fa-calendar-edit text-info"></i> 
+                           <strong>Обновлен:</strong> {{ membership.updated_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                <!-- Быстрые действия -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Действия</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if membership.can_enter %}
+                            <a href="{% url 'register_visit' membership.pk %}" class="btn btn-success">
+                                <i class="fas fa-door-open"></i> Зарегистрировать посещение
+                            </a>
+                            {% endif %}
+                            
+                            {% if membership.status == 'active' and membership.plan.can_freeze %}
+                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#freezeModal">
+                                <i class="fas fa-snowflake"></i> Заморозить
+                            </button>
+                            {% endif %}
+                            
+                            {% if membership.status == 'frozen' %}
+                            <form method="post" action="{% url 'membership_update' membership.pk %}" class="d-grid">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="active">
+                                <input type="hidden" name="frozen_until" value="">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-fire"></i> Разморозить
+                                </button>
+                            </form>
+                            {% endif %}
+                            
+                            <a href="#" class="btn btn-primary">
+                                <i class="fas fa-credit-card"></i> Оформить платеж
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для заморозки -->
+{% if membership.status == 'active' and membership.plan.can_freeze %}
+<div class="modal fade" id="freezeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Заморозка абонемента</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'membership_update' membership.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Заморозить абонемент до:</p>
+                    <input type="date" name="frozen_until" class="form-control" required>
+                    <input type="hidden" name="status" value="frozen">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Заморозить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление тарифа{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Подтверждение удаления</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="fas fa-trash-alt fa-5x text-danger mb-3"></i>
+                    <h4>Вы уверены, что хотите удалить тариф?</h4>
+                    <p class="lead">{{ plan.name }}</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Внимание!</strong> Это действие нельзя отменить.
+                        {% if plan.memberships.exists %}
+                        <br>У тарифа есть {{ plan.memberships.count }} активных абонементов.
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'membership_plan_detail' plan.pk %}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Удалить навсегда
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

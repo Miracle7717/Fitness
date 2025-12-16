@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if membership %}Редактирование абонемента{% else %}Добавление абонемента{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-id-card"></i>
+                    {% if membership %}Редактирование абонемента{% else %}Добавление нового абонемента{% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if not membership %}
+                    <!-- Форма создания нового абонемента -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.client|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.plan|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    {{ form.auto_renewal|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form.notes|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    {% else %}
+                    <!-- Форма редактирования существующего абонемента -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Клиент:</strong> {{ membership.client.get_full_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Тариф:</strong> {{ membership.plan.name }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.status|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.remaining_visits|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    {{ form.auto_renewal|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.frozen_until|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form.notes|as_crispy_field }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{% if membership %}{% url 'membership_detail' membership.pk %}{% else %}{% url 'membership_list' %}{% endif %}" 
+                           class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}  
