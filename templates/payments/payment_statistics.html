@@ -1,0 +1,86 @@
+% extends 'base.html' %}
+{% block title %}Статистика платежей{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-chart-bar"></i> Статистика платежей</h1>
+        
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">Общая сумма</h5>
+                        <p class="card-text display-6">{{ total_payments|floatformat:2 }} руб.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">За сегодня</h5>
+                        <p class="card-text display-6">{{ today_payments|floatformat:2 }} руб.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">За месяц</h5>
+                        <p class="card-text display-6">{{ month_payments|floatformat:2 }} руб.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">Всего платежей</h5>
+                        <p class="card-text display-6">{{ total_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Статистика по типам платежей</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Тип платежа</th>
+                                <th>Количество</th>
+                                <th>Сумма</th>
+                                <th>Доля</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in type_stats %}
+                            <tr>
+                                <td>{{ stat.payment_type }}</td>
+                                <td>{{ stat.count }}</td>
+                                <td>{{ stat.total|floatformat:2 }} руб.</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: {% widthratio stat.total total_payments 100 %}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <a href="{% url 'payment_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к платежам
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

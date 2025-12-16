@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Должники{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-exclamation-triangle"></i> Список должников</h1>
+        <p class="lead">Клиенты с просроченными абонементами</p>
+        
+        {% if debtors %}
+        {% for client, memberships in debtors %}
+        <div class="card mb-3">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <a href="{% url 'client_detail' client.pk %}" class="text-white text-decoration-none">
+                        {{ client.get_full_name }}
+                    </a>
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Телефон:</strong> {{ client.phone }}</p>
+                <p><strong>Email:</strong> {{ client.email|default:"Не указан" }}</p>
+                
+                <h6>Просроченные абонементы:</h6>
+                <ul class="list-group">
+                    {% for membership in memberships %}
+                    <li class="list-group-item">
+                        {{ membership.plan.name }} - истек {{ membership.end_date|date:"d.m.Y" }}
+                        (просрочено на {{ today|timeuntil:membership.end_date }})
+                        <a href="{% url 'create_subscription_payment' membership.pk %}" class="btn btn-sm btn-success float-end">
+                            <i class="fas fa-credit-card"></i> Оформить платеж
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Ура! Должников нет!
+        </div>
+        {% endif %}
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <a href="{% url 'payment_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к платежам
+                </a>
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Отправить уведомления
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

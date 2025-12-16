@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Платеж #{{ payment.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Заголовок и кнопки -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">
+                    <i class="fas fa-credit-card"></i> Платеж #{{ payment.id }}
+                </h1>
+                <p class="text-muted mb-0">{{ payment.payment_date|date:"d.m.Y H:i" }}</p>
+            </div>
+            <div class="btn-group">
+                <a href="{% url 'payment_update' payment.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Редактировать
+                </a>
+                <a href="{% url 'payment_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Основная информация -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Информация о платеже</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Клиент:</strong> 
+                                    <a href="{% url 'client_detail' payment.client.pk %}">
+                                        {{ payment.client.get_full_name }}
+                                    </a>
+                                </p>
+                                <p><strong>Телефон:</strong> {{ payment.client.phone }}</p>
+                                {% if payment.membership %}
+                                <p><strong>Абонемент:</strong> 
+                                    <a href="{% url 'membership_detail' payment.membership.pk %}">
+                                        {{ payment.membership.plan.name }}
+                                    </a>
+                                </p>
+                                {% endif %}
+                                {% if payment.membership_plan %}
+                                <p><strong>Тариф:</strong> 
+                                    <a href="{% url 'membership_plan_detail' payment.membership_plan.pk %}">
+                                        {{ payment.membership_plan.name }}
+                                    </a>
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Сумма:</strong> 
+                                    <span class="h4 text-primary">{{ payment.amount }} руб.</span>
+                                </p>
+                                <p><strong>Тип платежа:</strong> 
+                                    <span class="badge bg-info">{{ payment.get_payment_type_display_name }}</span>
+                                </p>
+                                <p><strong>Метод оплаты:</strong> {{ payment.get_payment_method_display_name }}</p>
+                                <p><strong>Статус:</strong> 
+                                    {% if payment.status == 'completed' %}
+                                    <span class="badge bg-success">{{ payment.get_status_display_name }}</span>
+                                    {% elif payment.status == 'pending' %}
+                                    <span class="badge bg-warning">{{ payment.get_status_display_name }}</span>
+                                    {% elif payment.status == 'cancelled' %}
+                                    <span class="badge bg-secondary">{{ payment.get_status_display_name }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ payment.get_status_display_name }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if payment.period_start %}
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p><strong>Период действия:</strong></p>
+                                <p>{{ payment.period_start|date:"d.m.Y" }} - {{ payment.period_end|date:"d.m.Y" }}</p>
+                                <p><small class="text-muted">
+                                    {{ payment.period_days }} дней, 
+                                    {{ payment.price_per_day }} руб./день
+                                </small></p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if payment.notes %}
+                        <div class="mt-3">
+                            <h6>Примечания:</h6>
+                            <p class="mb-0">{{ payment.notes|linebreaks }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Боковая панель -->
+            <div class="col-md-4">
+                <!-- Чек -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Чек/квитанция</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        {% if payment.receipt %}
+                        <div class="mb-3">
+                            <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                            <p class="mt-2">Чек загружен</p>
+                            <a href="{{ payment.receipt.url }}" class="btn btn-danger w-100" target="_blank">
+                                <i class="fas fa-download"></i> Скачать чек
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="py-4">
+                            <i class="fas fa-file-invoice fa-3x text-muted"></i>
+                            <p class="text-muted mt-2">Чек не загружен</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Системная информация -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Системная информация</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><i class="fas fa-calendar-plus text-success"></i> 
+                           <strong>Создан:</strong> {{ payment.created_at|date:"d.m.Y H:i" }}</p>
+                        <p><i class="fas fa-calendar-edit text-info"></i> 
+                           <strong>Обновлен:</strong> {{ payment.updated_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                <!-- Быстрые действия -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Действия</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if payment.can_refund %}
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#refundModal">
+                                <i class="fas fa-undo"></i> Возврат платежа
+                            </button>
+                            {% endif %}
+                            
+                            <a href="{% url 'reminder_create' %}" class="btn btn-info">
+                                <i class="fas fa-bell"></i> Создать напоминание
+                            </a>
+                            
+                            <a href="#" class="btn btn-primary">
+                                <i class="fas fa-print"></i> Распечатать квитанцию
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для возврата -->
+{% if payment.can_refund %}
+<div class="modal fade" id="refundModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Возврат платежа</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'payment_update' payment.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите вернуть платеж на сумму <strong>{{ payment.amount }} руб.</strong>?</p>
+                    <input type="hidden" name="status" value="refunded">
+                    <div class="mb-3">
+                        <label for="refund_notes" class="form-label">Причина возврата:</label>
+                        <textarea name="notes" class="form-control" id="refund_notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-warning">Подтвердить возврат</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}  
