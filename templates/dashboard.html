@@ -3,107 +3,113 @@
 {% block title %}Дашборд{% endblock %}
 
 {% block content %}
-<p class="lead">Добро пожаловать, {{ user.get_full_name|default:user.username }}! 
-    {% if user.is_superuser %}
-        <span class="badge bg-danger">Администратор</span>
-    {% elif user.is_staff %}
-        <span class="badge bg-primary">Сотрудник</span>
-    {% else %}
-        <span class="badge bg-secondary">Пользователь</span>
-    {% endif %}
-</p>
-<div class="row mt-4">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-users"></i> Всего клиентов</h5>
-                <p class="card-text display-6">{{ total_clients }}</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-check-circle"></i> Активные абонементы</h5>
-                <p class="card-text display-6">{{ active_memberships }}</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-clock"></i> Истекают скоро</h5>
-                <p class="card-text display-6">{{ expiring_soon }}</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card text-white bg-danger">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-times-circle"></i> Просроченные</h5>
-                <p class="card-text display-6">{{ expired }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="row">
-    {% if user.is_staff or user.is_superuser %}
-    <div class="col-md-3">
-        <a href="#" class="btn btn-primary w-100 mb-2">
-            <i class="fas fa-users"></i> Клиенты
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="#" class="btn btn-info w-100 mb-2">
-            <i class="fas fa-list-alt"></i> Тарифы
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="#" class="btn btn-success w-100 mb-2">
-            <i class="fas fa-credit-card"></i> Платежи
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="#" class="btn btn-warning w-100 mb-2">
-            <i class="fas fa-chart-bar"></i> Отчеты
-        </a>
-    </div>
-    {% endif %}
-</div>
-<div class="row mt-4">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Системная информация</h5>
+    <div class="col-12">
+        <h1><i class="fas fa-tachometer-alt"></i> Дашборд системы</h1>
+        <p class="lead">Добро пожаловать, {{ user.get_full_name|default:user.username }}!</p>
+        
+        <!-- Основная статистика -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-users"></i> Клиентов</h5>
+                        <p class="card-text display-6">{{ total_clients }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <p>Вы вошли как: <strong>{{ user.get_full_name }}</strong></p>
-                <p>Роль: <span class="badge bg-primary">{{ user.get_role_display_name }}</span></p>
-                <p>Email: {{ user.email|default:"Не указан" }}</p>
-                <p>Телефон: {{ user.phone|default:"Не указан" }}</p>
-                <p>Дата регистрации: {{ user.date_joined|date:"d.m.Y H:i" }}</p>
+            
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-id-card"></i> Абонементов</h5>
+                        <p class="card-text display-6">{{ active_memberships }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-credit-card"></i> Выручка</h5>
+                        <p class="card-text display-6">{{ total_payments|floatformat:0 }} руб.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-clock"></i> Истекают</h5>
+                        <p class="card-text display-6">{{ expiring_soon }}</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
+        
+        <!-- Быстрые действия -->
+        <div class="card mt-4">
             <div class="card-header">
-                <h5 class="mb-0">Последние действия</h5>
+                <h5 class="mb-0">Быстрые действия</h5>
             </div>
             <div class="card-body">
-                <p class="text-muted">Здесь будет отображаться история действий</p>
-                <div class="list-group">
-                    <div class="list-group-item">
-                        <small>Вы вошли в систему</small>
-                        <br>
-                        <small class="text-muted">Только что</small>
-                    </div>  
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{% url 'client_create' %}" class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-user-plus"></i> Клиент
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'membership_create' %}" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-id-card"></i> Абонемент
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'payment_create' %}" class="btn btn-info w-100 mb-2">
+                            <i class="fas fa-credit-card"></i> Платеж
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'reports_dashboard' %}" class="btn btn-warning w-100 mb-2">
+                            <i class="fas fa-chart-bar"></i> Отчеты
+                        </a>
+                    </div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Последние платежи -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Последние платежи</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_payments %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Клиент</th>
+                                <th>Сумма</th>
+                                <th>Метод</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments %}
+                            <tr>
+                                <td>{{ payment.payment_date|date:"d.m.Y H:i" }}</td>
+                                <td>{{ payment.client.get_full_name }}</td>
+                                <td>{{ payment.amount }} руб.</td>
+                                <td>{{ payment.get_payment_method_display_name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Нет платежей</p>
+                {% endif %}
             </div>
         </div>
     </div>

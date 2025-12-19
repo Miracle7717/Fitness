@@ -11,7 +11,7 @@ urlpatterns = [
     path('clients/', include('clients.urls')),
     path('subscriptions/', include('subscriptions.urls')),  # РАСКОММЕНТИРОВАТЬ
     path('payments/', include('payments.urls')),
-    # path('reports/', include('reports.urls')),
+    path('reports/', include('reports.urls')),
 ]
 
 if settings.DEBUG:

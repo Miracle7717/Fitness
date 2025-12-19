@@ -1,11 +1,106 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from openpyxl import Workbook
-import io
+from django.http import HttpResponse
+from django.db.models import Count, Sum, Q
+from django.utils import timezone
+from datetime import timedelta
+import json
+
+@login_required
+def reports_dashboard(request):
+    """Панель отчетов"""
+    return render(request, 'reports/dashboard.html')
+
+@login_required
+def financial_report(request):
+    """Финансовый отчет"""
+    from payments.models import Payment
+    from django.db.models.functions import TruncMonth
+    
+    # Статистика по месяцам
+    monthly_stats = Payment.objects.filter(status='completed').annotate(
+        month=TruncMonth('payment_date')
+    ).values('month').annotate(
+        total=Sum('amount'),
+        count=Count('id')
+    ).order_by('month')
+    
+    # Подготовка данных для графика
+    chart_data = {
+        'labels': [stat['month'].strftime('%b %Y') for stat in monthly_stats],
+        'data': [float(stat['total']) for stat in monthly_stats]
+    }
+    
+    context = {
+        'monthly_stats': monthly_stats,
+        'chart_data_json': json.dumps(chart_data),
+    }
+    return render(request, 'reports/financial.html', context)
+
+@login_required
+def clients_report(request):
+    """Отчет по клиентам"""
+    from clients.models import Client
+    from subscriptions.models import Membership
+    
+    # Статистика по клиентам
+    clients_by_status = Client.objects.values('status').annotate(
+        count=Count('id')
+    ).order_by('status')
+    
+    # Новые клиенты по месяцам
+    from django.db.models.functions import TruncMonth
+    new_clients_monthly = Client.objects.annotate(
+        month=TruncMonth('registration_date')
+    ).values('month').annotate(
+        count=Count('id')
+    ).order_by('month')[:12]
+    
+    # Клиенты с активными абонементами
+    clients_with_active = Client.objects.filter(
+        memberships__status='active'
+    ).distinct().count()
+    
+    context = {
+        'clients_by_status': clients_by_status,
+        'new_clients_monthly': new_clients_monthly,
+        'clients_with_active': clients_with_active,
+        'total_clients': Client.objects.count(),
+    }
+    return render(request, 'reports/clients.html', context)
+
+@login_required
+def membership_report(request):
+    """Отчет по абонементам"""
+    from subscriptions.models import Membership, MembershipPlan
+    
+    # Статистика по статусам
+    memberships_by_status = Membership.objects.values('status').annotate(
+        count=Count('id')
+    ).order_by('status')
+    
+    # Популярные тарифы
+    popular_plans = MembershipPlan.objects.annotate(
+        active_count=Count('memberships', filter=Q(memberships__status='active')),
+        total_count=Count('memberships')
+    ).order_by('-active_count')[:10]
+    
+    # Истекающие абонементы
+    today = timezone.now().date()
+    week_later = today + timedelta(days=7)
+    expiring_soon = Membership.objects.filter(
+        status='active',
+        end_date__range=[today, week_later]
+    ).count()
+    
+    context = {
+        'memberships_by_status': memberships_by_status,
+        'popular_plans': popular_plans,
+        'expiring_soon': expiring_soon,
+        'total_memberships': Membership.objects.count(),
+        'active_memberships': Membership.objects.filter(status='active').count(),
+    }
+    return render(request, 'reports/memberships.html', context)
 
 @login_required
 def export_clients_pdf(request):
