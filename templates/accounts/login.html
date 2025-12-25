@@ -40,21 +40,16 @@
                 <hr>
                 
                 <div class="text-center">
-                    <p class="mb-0 text-muted">
-                        <i class="fas fa-info-circle"></i> Тестовые учетные данные:
+                    <p class="mb-1">Нет аккаунта?
+                        <a href="{% url 'register' %}" class="text-decoration-none">
+                            <i class="fas fa-user-plus"></i> Зарегистрироваться
+                        </a>
                     </p>
-                    <div class="row mt-2">
-                        <div class="col-md-6">
-                            <p class="mb-1"><strong>Администратор:</strong></p>
-                            <p class="mb-1">Логин: <code>admin</code></p>
-                            <p class="mb-0">Пароль: <code>admin123</code></p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-1"><strong>Менеджер:</strong></p>
-                            <p class="mb-1">Логин: <code>manager</code></p>
-                            <p class="mb-0">Пароль: <code>manager123</code></p>
-                        </div>
-                    </div>
+                    <p class="mb-0">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                            <i class="fas fa-key"></i> Забыли пароль?
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>

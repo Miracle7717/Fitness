@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчеты{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-chart-bar"></i> Панель отчетов</h1>
+        <p class="lead">Выберите отчет для просмотра</p>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-users"></i> Отчет по клиентам</h5>
+                        <p class="card-text">Статистика по клиентам и их статусам</p>
+                        <a href="{% url 'clients_report' %}" class="btn btn-primary">Просмотреть</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-credit-card"></i> Финансовый отчет</h5>
+                        <p class="card-text">Выручка и платежи по месяцам</p>
+                        <a href="{% url 'financial_report' %}" class="btn btn-success">Просмотреть</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-id-card"></i> Отчет по абонементам</h5>
+                        <p class="card-text">Статистика по абонементам и планам</p>
+                        <a href="{% url 'membership_report' %}" class="btn btn-info">Просмотреть</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Экспорт данных</h3>
+                <div class="list-group">
+                    <a href="{% url 'export_clients_pdf' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-pdf"></i> Экспорт клиентов в PDF
+                    </a>
+                    <a href="{% url 'export_payments_excel' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-excel"></i> Экспорт платежей в Excel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

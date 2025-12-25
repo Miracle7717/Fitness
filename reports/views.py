@@ -5,8 +5,13 @@ from django.db.models import Count, Sum, Q
 from django.utils import timezone
 from datetime import timedelta
 import json
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from openpyxl import Workbook
+from accounts.decorators import manager_required
 
-@login_required
+@manager_required
 def reports_dashboard(request):
     """Панель отчетов"""
     return render(request, 'reports/dashboard.html')
@@ -37,7 +42,7 @@ def financial_report(request):
     }
     return render(request, 'reports/financial.html', context)
 
-@login_required
+@manager_required
 def clients_report(request):
     """Отчет по клиентам"""
     from clients.models import Client
@@ -69,7 +74,7 @@ def clients_report(request):
     }
     return render(request, 'reports/clients.html', context)
 
-@login_required
+@manager_required
 def membership_report(request):
     """Отчет по абонементам"""
     from subscriptions.models import Membership, MembershipPlan
@@ -102,7 +107,7 @@ def membership_report(request):
     }
     return render(request, 'reports/memberships.html', context)
 
-@login_required
+@manager_required
 def export_clients_pdf(request):
     """Экспорт клиентов в PDF"""
     from clients.models import Client
@@ -138,7 +143,7 @@ def export_clients_pdf(request):
     response['Content-Disposition'] = 'attachment; filename="clients.pdf"'
     return response
 
-@login_required
+@manager_required
 def export_payments_excel(request):
     """Экспорт платежей в Excel"""
     from payments.models import Payment

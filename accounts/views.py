@@ -2,12 +2,20 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm, UserUpdateForm
+from .models import User
 from clients.models import Client
 from subscriptions.models import Membership, MembershipPlan
 from payments.models import Payment
 from django.utils import timezone
 import datetime
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView
+)
+from django.urls import reverse_lazy
 from django.db.models import Count, Sum, Q
 
 def login_view(request):
@@ -40,6 +48,39 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'Вы успешно вышли из системы.')
     return redirect('home')
+
+def register_view(request):
+    """View для регистрации нового пользователя"""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, f'Аккаунт создан успешно! Добро пожаловать, {user.get_full_name()}!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+    else:
+        form = RegisterForm()
+
+    return render(request, 'accounts/register.html', {'form': form})
+
+@login_required
+def profile_view(request):
+    """View для просмотра и редактирования профиля"""
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Профиль успешно обновлен!')
+            return redirect('profile')
+    else:
+        form = UserUpdateForm(instance=request.user)
+
+    return render(request, 'accounts/profile.html', {'form': form})
 
 @login_required
 def dashboard_view(request):
@@ -137,3 +178,19 @@ def dashboard_view(request):
     }
     
     return render(request, 'dashboard.html', context)
+
+# Password Reset Views
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'accounts/password_reset.html'
+    email_template_name = 'accounts/password_reset_email.html'
+    success_url = reverse_lazy('password_reset_done')
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'accounts/password_reset_done.html'
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'accounts/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'accounts/password_reset_complete.html'
