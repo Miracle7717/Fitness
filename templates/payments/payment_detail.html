@@ -56,7 +56,7 @@
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Сумма:</strong> 
-                                    <span class="h4 text-primary">{{ payment.amount }} руб.</span>
+                                    <span class="h4 text-primary">{{ payment.amount }} сом</span>
                                 </p>
                                 <p><strong>Тип платежа:</strong> 
                                     <span class="badge bg-info">{{ payment.get_payment_type_display_name }}</span>
@@ -83,7 +83,7 @@
                                 <p>{{ payment.period_start|date:"d.m.Y" }} - {{ payment.period_end|date:"d.m.Y" }}</p>
                                 <p><small class="text-muted">
                                     {{ payment.period_days }} дней, 
-                                    {{ payment.price_per_day }} руб./день
+                                    {{ payment.price_per_day }} сом/день
                                 </small></p>
                             </div>
                         </div>
@@ -177,7 +177,7 @@
             <form method="post" action="{% url 'payment_update' payment.pk %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <p>Вы уверены, что хотите вернуть платеж на сумму <strong>{{ payment.amount }} руб.</strong>?</p>
+                    <p>Вы уверены, что хотите вернуть платеж на сумму <strong>{{ payment.amount }} сом</strong>?</p>
                     <input type="hidden" name="status" value="refunded">
                     <div class="mb-3">
                         <label for="refund_notes" class="form-label">Причина возврата:</label>

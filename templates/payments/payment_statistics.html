@@ -10,7 +10,7 @@
                 <div class="card text-white bg-primary">
                     <div class="card-body">
                         <h5 class="card-title">Общая сумма</h5>
-                        <p class="card-text display-6">{{ total_payments|floatformat:2 }} руб.</p>
+                        <p class="card-text display-6">{{ total_payments|floatformat:2 }} сом</p>
                     </div>
                 </div>
             </div>
@@ -18,7 +18,7 @@
                 <div class="card text-white bg-success">
                     <div class="card-body">
                         <h5 class="card-title">За сегодня</h5>
-                        <p class="card-text display-6">{{ today_payments|floatformat:2 }} руб.</p>
+                        <p class="card-text display-6">{{ today_payments|floatformat:2 }} сом</p>
                     </div>
                 </div>
             </div>
@@ -26,7 +26,7 @@
                 <div class="card text-white bg-info">
                     <div class="card-body">
                         <h5 class="card-title">За месяц</h5>
-                        <p class="card-text display-6">{{ month_payments|floatformat:2 }} руб.</p>
+                        <p class="card-text display-6">{{ month_payments|floatformat:2 }} сом</p>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                             <tr>
                                 <td>{{ stat.payment_type }}</td>
                                 <td>{{ stat.count }}</td>
-                                <td>{{ stat.total|floatformat:2 }} руб.</td>
+                                <td>{{ stat.total|floatformat:2 }} сом</td>
                                 <td>
                                     <div class="progress">
                                         <div class="progress-bar" style="width: {% widthratio stat.total total_payments 100 %}%"></div>

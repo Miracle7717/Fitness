@@ -41,7 +41,7 @@ class Client(models.Model):
         max_length=20,
         verbose_name='Телефон',
         unique=True,
-        help_text='Формат: +7XXXXXXXXXX'
+        help_text='Формат: +996XXXXXXXXX'
     )
     
     email = models.EmailField(

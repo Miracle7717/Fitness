@@ -28,7 +28,7 @@
                             </div>
                             <div class="card-body">
                                 <p class="card-text">{{ plan.description|truncatechars:100 }}</p>
-                                <p class="h4 text-primary">{{ plan.price }} руб.</p>
+                                <p class="h4 text-primary">{{ plan.price }} сом</p>
                                 <p class="mb-1"><small>Период: {{ plan.get_period_display_text }}</small></p>
                                 <p class="mb-1">
                                     <small>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="card-body">
                                     <p class="card-text">{{ plan.description|truncatechars:100 }}</p>
-                                    <p class="h4 text-muted">{{ plan.price }} руб.</p>
+                                    <p class="h4 text-muted">{{ plan.price }} сом</p>
                                     <p class="mb-1"><small>Период: {{ plan.get_period_display_text }}</small></p>
                                     <p class="mb-3"><small class="text-muted">Тариф неактивен</small></p>
                                 </div>

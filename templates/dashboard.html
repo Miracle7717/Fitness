@@ -32,7 +32,7 @@
                 <div class="card text-white bg-info">
                     <div class="card-body">
                         <h5 class="card-title"><i class="fas fa-credit-card"></i> Выручка</h5>
-                        <p class="card-text display-6">{{ total_payments|floatformat:0 }} руб.</p>
+                        <p class="card-text display-6">{{ total_payments|floatformat:0 }} сом</p>
                     </div>
                 </div>
             </div>
@@ -100,7 +100,7 @@
                             <tr>
                                 <td>{{ payment.payment_date|date:"d.m.Y H:i" }}</td>
                                 <td>{{ payment.client.get_full_name }}</td>
-                                <td>{{ payment.amount }} руб.</td>
+                                <td>{{ payment.amount }} сом</td>
                                 <td>{{ payment.get_payment_method_display_name }}</td>
                             </tr>
                             {% endfor %}

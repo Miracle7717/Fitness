@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-12">
         <h1>{{ plan.name }}</h1>
-        <p>Цена: {{ plan.price }} руб.</p>
+        <p>Цена: {{ plan.price }} сом</p>
         <p>Период: {{ plan.get_period_display_text }}</p>
         <p>Посещения: {% if plan.is_unlimited %}Безлимит{% else %}{{ plan.visit_limit }}{% endif %}</p>
         

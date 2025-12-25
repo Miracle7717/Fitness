@@ -4,15 +4,15 @@ from .models import Client
 
 class ClientForm(forms.ModelForm):
     phone_validator = RegexValidator(
-        regex=r'^\+7\d{10}$',
-        message='Телефон должен быть в формате: +7XXXXXXXXXX'
+        regex=r'^\+996\d{9}$',
+        message='Телефон должен быть в формате: +996XXXXXXXXX'
     )
     
     phone = forms.CharField(
         validators=[phone_validator],
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '+7XXXXXXXXXX'
+            'placeholder': '+996XXXXXXXXX'
         })
     )
     
