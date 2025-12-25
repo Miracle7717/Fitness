@@ -140,3 +140,42 @@ def client_statistics(request):
         'new_clients': new_clients,
     }
     return render(request, 'clients/client_statistics.html', context)
+
+@login_required
+def export_clients_pdf(request):
+    """Экспорт клиентов в PDF"""
+    from django.http import HttpResponse
+    import io
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+    
+    # Создаем PDF
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    
+    # Заголовок
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(50, 800, "Список клиентов фитнес-клуба")
+    
+    # Данные
+    p.setFont("Helvetica", 10)
+    y = 750
+    clients = Client.objects.all()
+    
+    for client in clients:
+        if y < 50:
+            p.showPage()
+            p.setFont("Helvetica", 10)
+            y = 750
+        
+        p.drawString(50, y, f"{client.get_full_name()}")
+        p.drawString(200, y, f"{client.phone}")
+        p.drawString(300, y, f"{client.email or '-'}")
+        y -= 20
+    
+    p.save()
+    
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="clients.pdf"'
+    return response

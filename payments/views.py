@@ -313,3 +313,40 @@ def create_subscription_payment(request, membership_id):
         'membership': membership,
     }
     return render(request, 'payments/create_subscription_payment.html', context)
+
+@login_required
+def export_payments_excel(request):
+    """Экспорт платежей в Excel"""
+    from django.http import HttpResponse
+    import io
+    from openpyxl import Workbook
+    
+    # Создаем Excel
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Платежи"
+    
+    # Заголовки
+    headers = ['ID', 'Дата', 'Клиент', 'Сумма', 'Тип', 'Метод', 'Статус']
+    for col_num, header in enumerate(headers, 1):
+        ws.cell(row=1, column=col_num, value=header)
+    
+    # Данные
+    payments = Payment.objects.all().select_related('client')
+    for row_num, payment in enumerate(payments, 2):
+        ws.cell(row=row_num, column=1, value=payment.id)
+        ws.cell(row=row_num, column=2, value=payment.payment_date.strftime("%d.%m.%Y %H:%M"))
+        ws.cell(row=row_num, column=3, value=payment.client.get_full_name())
+        ws.cell(row=row_num, column=4, value=float(payment.amount))
+        ws.cell(row=row_num, column=5, value=payment.get_payment_type_display_name())
+        ws.cell(row=row_num, column=6, value=payment.get_payment_method_display_name())
+        ws.cell(row=row_num, column=7, value=payment.get_status_display_name())
+    
+    # Сохраняем
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="payments.xlsx"'
+    return response

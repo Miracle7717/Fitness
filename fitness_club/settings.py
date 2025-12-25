@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'clients',
     'subscriptions',
     'payments',
-    'reports',
 ]
 
 # Crispy Forms settings

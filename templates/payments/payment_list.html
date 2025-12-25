@@ -8,9 +8,14 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1><i class="fas fa-credit-card"></i> Платежи</h1>
-            <a href="{% url 'payment_create' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Добавить платеж
-            </a>
+            <div>
+                <a href="{% url 'export_payments_excel' %}" class="btn btn-success me-2">
+                    <i class="fas fa-file-excel"></i> Экспорт в Excel
+                </a>
+                <a href="{% url 'payment_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить платеж
+                </a>
+            </div>
         </div>
         
         <!-- Форма поиска -->

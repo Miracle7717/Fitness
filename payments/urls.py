@@ -10,6 +10,7 @@ urlpatterns = [
     path('<int:pk>/update/', views.payment_update, name='payment_update'),
     path('<int:pk>/delete/', views.payment_delete, name='payment_delete'),
     path('statistics/', views.payment_statistics, name='payment_statistics'),
+    path('export/excel/', views.export_payments_excel, name='export_payments_excel'),
     
     # Напоминания
     path('reminders/', views.reminder_list, name='reminder_list'),
