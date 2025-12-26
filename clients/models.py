@@ -4,20 +4,17 @@ from django.utils import timezone
 import os
 
 def client_photo_path(instance, filename):
-    # Файл будет загружен в MEDIA_ROOT/clients/photos/client_<id>/<filename>
     ext = filename.split('.')[-1]
     filename = f'photo_{instance.id}.{ext}'
     return os.path.join('clients', 'photos', f'client_{instance.id}', filename)
 
 class Client(models.Model):
-    # Статусы клиента
     STATUS_CHOICES = [
         ('active', 'Активный'),
         ('inactive', 'Неактивный'),
         ('suspended', 'Приостановлен'),
     ]
     
-    # Поля клиента
     first_name = models.CharField(
         max_length=50,
         verbose_name='Имя',
@@ -89,7 +86,6 @@ class Client(models.Model):
         null=True
     )
     
-    # Автоматические поля
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -121,7 +117,6 @@ class Client(models.Model):
             return None
         today = timezone.now().date()
         age = today.year - self.birth_date.year
-        # Проверяем, был ли уже день рождения в этом году
         if (today.month, today.day) < (self.birth_date.month, self.birth_date.day):
             age -= 1
         return age

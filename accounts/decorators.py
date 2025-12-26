@@ -20,13 +20,11 @@ def role_required(*roles):
         return _wrapped_view
     return decorator
 
-# Удобные декораторы для конкретных ролей
 admin_required = role_required('admin')
 manager_required = role_required('admin', 'manager')
 trainer_required = role_required('trainer')
 reception_required = role_required('reception')
 
-# Декораторы для уровней доступа
 def admin_or_manager_required(view_func):
     return role_required('admin', 'manager')(view_func)
 

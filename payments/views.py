@@ -16,7 +16,7 @@ def payment_list(request):
     form = PaymentSearchForm(request.GET or None)
     payments = Payment.objects.all().select_related('client', 'membership', 'membership_plan').order_by('-payment_date')
     
-    # Применяем фильтры поиска
+   
     if form.is_valid():
         search = form.cleaned_data.get('search')
         status = form.cleaned_data.get('status')
@@ -43,12 +43,12 @@ def payment_list(request):
         if end_date:
             payments = payments.filter(payment_date__date__lte=end_date)
     
-    # Статистика
+
     total_amount = payments.filter(status='completed').aggregate(total=Sum('amount'))['total'] or 0
     total_count = payments.count()
     completed_count = payments.filter(status='completed').count()
     
-    # Пагинация
+
     paginator = Paginator(payments, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -81,9 +81,8 @@ def payment_create(request):
             payment = form.save()
             messages.success(request, f'Платеж на сумму {payment.amount} руб. создан!')
             
-            # Если платеж завершен и есть абонемент, создаем напоминание об истечении
             if payment.status == 'completed' and payment.membership:
-                # Создаем напоминание за 7 дней до окончания
+
                 reminder_date = payment.period_end - datetime.timedelta(days=7)
                 if reminder_date > timezone.now().date():
                     Reminder.objects.create(
@@ -143,11 +142,10 @@ def payment_statistics(request):
     """Статистика по платежам"""
     today = timezone.now().date()
     
-    # Общая статистика
     total_payments = Payment.objects.filter(status='completed').aggregate(total=Sum('amount'))['total'] or 0
     total_count = Payment.objects.count()
     
-    # Статистика по месяцам
+
     from django.db.models.functions import TruncMonth
     monthly_stats = Payment.objects.filter(status='completed').annotate(
         month=TruncMonth('payment_date')
@@ -156,7 +154,7 @@ def payment_statistics(request):
         count=models.Count('id')
     ).order_by('-month')[:12]
     
-    # Статистика по типам платежей
+
     type_stats = Payment.objects.filter(status='completed').values(
         'payment_type'
     ).annotate(
@@ -164,7 +162,7 @@ def payment_statistics(request):
         count=models.Count('id')
     ).order_by('-total')
     
-    # Статистика по методам оплаты
+
     method_stats = Payment.objects.filter(status='completed').values(
         'payment_method'
     ).annotate(
@@ -172,13 +170,11 @@ def payment_statistics(request):
         count=models.Count('id')
     ).order_by('-total')
     
-    # Платежи за сегодня
     today_payments = Payment.objects.filter(
         status='completed',
         payment_date__date=today
     ).aggregate(total=Sum('amount'))['total'] or 0
     
-    # Платежи за этот месяц
     month_start = today.replace(day=1)
     month_payments = Payment.objects.filter(
         status='completed',
@@ -202,12 +198,11 @@ def reminder_list(request):
     """Список напоминаний"""
     reminders = Reminder.objects.all().select_related('client', 'membership').order_by('send_date')
     
-    # Разделяем по статусам
     pending_reminders = reminders.filter(send_status='pending')
     sent_reminders = reminders.filter(send_status='sent')
     failed_reminders = reminders.filter(send_status='failed')
     
-    # Просроченные напоминания
+
     overdue_reminders = pending_reminders.filter(send_date__lt=timezone.now())
     
     context = {
@@ -238,8 +233,6 @@ def reminder_send_now(request, pk):
     """Отправка напоминания сейчас"""
     reminder = get_object_or_404(Reminder, pk=pk)
     
-    # Здесь должна быть логика отправки (email, SMS и т.д.)
-    # Для демо просто помечаем как отправленное
     reminder.mark_as_sent()
     messages.success(request, 'Напоминание отправлено!')
     
@@ -248,14 +241,14 @@ def reminder_send_now(request, pk):
 @login_required
 def debtors_list(request):
     """Список должников"""
-    # Находим клиентов с просроченными абонементами
+
     today = timezone.now().date()
     expired_memberships = Membership.objects.filter(
         status='active',
         end_date__lt=today
     ).select_related('client')
     
-    # Группируем по клиентам
+
     debtors = {}
     for membership in expired_memberships:
         client = membership.client
@@ -263,7 +256,7 @@ def debtors_list(request):
             debtors[client] = []
         debtors[client].append(membership)
     
-    # Сортируем по количеству дней просрочки
+ 
     sorted_debtors = sorted(
         debtors.items(),
         key=lambda x: max((today - m.end_date).days for m in x[1]),
@@ -295,7 +288,7 @@ def create_subscription_payment(request, membership_id):
             messages.success(request, f'Платеж за абонемент создан!')
             return redirect('payment_detail', pk=payment.pk)
     else:
-        # Автоматически заполняем форму
+    
         initial_data = {
             'client': membership.client,
             'membership': membership,

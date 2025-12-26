@@ -13,7 +13,7 @@ def client_list(request):
     form = ClientSearchForm(request.GET or None)
     clients = Client.objects.all().order_by('last_name', 'first_name')
     
-    # Применяем фильтры поиска
+
     if form.is_valid():
         search = form.cleaned_data.get('search')
         status = form.cleaned_data.get('status')
@@ -30,8 +30,7 @@ def client_list(request):
         if status:
             clients = clients.filter(status=status)
     
-    # Пагинация
-    paginator = Paginator(clients, 10)  # 10 клиентов на страницу
+    paginator = Paginator(clients, 10)  
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -47,7 +46,6 @@ def client_detail(request, pk):
     """Детальная информация о клиенте"""
     client = get_object_or_404(Client, pk=pk)
     
-    # Получаем активные абонементы клиента
     active_memberships = client.memberships.filter(status='active')
     expired_memberships = client.memberships.filter(status='expired')
     all_memberships = client.memberships.all().order_by('-start_date')
@@ -117,12 +115,12 @@ def client_statistics(request):
     inactive_clients = Client.objects.filter(status='inactive').count()
     suspended_clients = Client.objects.filter(status='suspended').count()
     
-    # Клиенты с активными абонементами
+
     clients_with_active_memberships = Client.objects.filter(
         memberships__status='active'
     ).distinct().count()
     
-    # Новые клиенты за последние 30 дней
+
     from django.utils import timezone
     from datetime import timedelta
     

@@ -87,7 +87,6 @@ def dashboard_view(request):
     """Дашборд системы с расширенной аналитикой"""
     today = timezone.now().date()
     
-    # 1. Статистика клиентов
     total_clients = Client.objects.count()
     active_clients = Client.objects.filter(status='active').count()
     new_clients_today = Client.objects.filter(
@@ -97,24 +96,20 @@ def dashboard_view(request):
         registration_date__date__gte=today.replace(day=1)
     ).count()
     
-    # 2. Статистика абонементов
     active_memberships = Membership.objects.filter(status='active').count()
     total_memberships = Membership.objects.count()
     
-    # Абонементы, которые скоро истекут (менее 7 дней)
     week_later = today + datetime.timedelta(days=7)
     expiring_soon = Membership.objects.filter(
         status='active',
         end_date__range=[today, week_later]
     ).count()
     
-    # Просроченные абонементы
     expired = Membership.objects.filter(
         status='active',
         end_date__lt=today
     ).count()
     
-    # 3. Статистика платежей
     total_payments = Payment.objects.filter(status='completed').aggregate(
         total=Sum('amount')
     )['total'] or 0
@@ -129,26 +124,22 @@ def dashboard_view(request):
         payment_date__date__gte=today.replace(day=1)
     ).aggregate(total=Sum('amount'))['total'] or 0
     
-    # 4. Популярные тарифы
     popular_plans = MembershipPlan.objects.annotate(
         active_count=Count('memberships', filter=Q(memberships__status='active'))
     ).filter(active_count__gt=0).order_by('-active_count')[:5]
     
-    # 5. Последние платежи
     recent_payments = Payment.objects.filter(
         status='completed'
     ).select_related('client').order_by('-payment_date')[:10]
     
-    # 6. Последние клиенты
     recent_clients = Client.objects.all().order_by('-registration_date')[:10]
     
-    # 7. Общая статистика
     completed_payments_count = Payment.objects.filter(status='completed').count()
     statistics = {
         'avg_payment': total_payments / completed_payments_count if completed_payments_count > 0 else 0,
         'clients_with_memberships': Client.objects.filter(memberships__status='active').distinct().count(),
-        'renewal_rate': '78%',  # В реальном проекте рассчитать
-        'occupancy_rate': '65%',  # В реальном проекте рассчитать
+        'renewal_rate': '78%',  
+        'occupancy_rate': '65%',  
     }
     
     context = {
